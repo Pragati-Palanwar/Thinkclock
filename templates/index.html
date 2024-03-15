@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Cell Information</title>
+    <!-- Add any CSS link here -->
+</head>
+<body>
+    <h1>Battery Cell Information</h1>
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="file" id="fileInput" accept=".csv">
+        <input type="submit" value="Upload">
+    </form>
+
+    <div id="bodePlot"></div>
+    <div id="circuitParameters"></div>
+    <div id="SoH"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#uploadForm').submit(function(event) {
+                event.preventDefault();
+                var formData = new FormData($(this)[0]);
+
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('#bodePlot').html(response.bode_plot);
+                        $('#circuitParameters').html('<pre>' + JSON.stringify(response.circuit_parameters, null, 2) + '</pre>');
+                        $('#SoH').text('State-of-Health: ' + response.SoH.toFixed(2) + '%');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
